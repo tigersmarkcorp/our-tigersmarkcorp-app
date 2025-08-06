@@ -136,7 +136,7 @@ export default function Home() {
   const duplicatedLogos = [...logos, ...logos]; // Duplicate for infinite scroll
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-white overflow-hidden">
+    <div className="flex flex-col min-h-screen font-sans  bg-black text-white overflow-hidden">
       {/* === Hero Section === */}
       <div className="relative z-0 min-h-[90vh]">
         <div className="absolute inset-0 -z-10">
@@ -240,7 +240,7 @@ export default function Home() {
       </div>
 
    {/* === Professional Services Section === */}
-<section id="services" className="relative w-full px-4 sm:px-8 py-20 lg:py-28 bg-navy-900 overflow-hidden">
+<section id="services" className="relative w-full px-4 sm:px-8 py-20 lg:py-28 bg-black overflow-hidden">
   {/* Background elements */}
   <div className="absolute inset-0 opacity-10 pointer-events-none">
     <div 
@@ -477,7 +477,7 @@ export default function Home() {
   </div>
 </section>
       {/* === Why Choose Us === */}
-<section id="why-choose-us" className="relative w-full px-4 sm:px-8 py-20 lg:py-28 bg-navy-900 overflow-hidden">
+<section id="why-choose-us" className="relative w-full px-4 sm:px-8 py-20 lg:py-28 bg-navy-900  bg-black overflow-hidden">
   {/* Background elements */}
   <div className="absolute inset-0 opacity-10">
     <div className="absolute inset-0 bg-[url('/assets/grid-pattern.svg')] bg-[length:60px_60px]"></div>
@@ -563,7 +563,7 @@ export default function Home() {
     </div>
   </div>
 </section>
- <section id="recent-projects" className="relative w-full  to-gray-950 px-6 py-24 z-10 overflow-hidden">
+ <section id="recent-projects" className="relative w-full  bg-black  to-gray-950 px-6 py-24 z-10 overflow-hidden">
   {/* Background Decoration */}
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
    <div className="absolute Top-0 left-0 w-full h-2/3 bg-gradient-to-t from-orange-500/5 to-transparent pointer-events-none"></div>
@@ -811,7 +811,7 @@ export default function Home() {
       
 
       {/* === Our Location === */}
-      <section id="location" className="bg-navy-900 w-full py-16 text-center z-10">
+      <section id="location" className="bg-navy-900 w-full py-16 text-center  bg-black z-10">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -853,7 +853,7 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
         viewport={{ once: true }}
-        className="bg-navy-900 w-full py-12 px-6 sm:px-20 text-sm text-gray-300 z-10"
+        className="bg-navy-900 w-full py-12 px-6 sm:px-20 text-sm  bg-black text-gray-300 z-10"
       >
         <div className="max-w-[1600px] mx-auto grid md:grid-cols-4 gap-12">
           <div className="space-y-4">
