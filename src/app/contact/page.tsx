@@ -1,7 +1,8 @@
 'use client';
+
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   FaPhone,
   FaViber,
@@ -11,8 +12,9 @@ import {
   FaMapMarkerAlt,
   FaTimes,
   FaCommentDots,
+  FaBars,
 } from 'react-icons/fa';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
 
 interface QuickAction {
   icon: React.ReactNode;
@@ -39,13 +41,15 @@ interface ContactInfo {
 
 export default function ContactUsPage() {
   const [open, setOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
-  // Parallax effect on hero
   const y = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0.7]);
-  const toggleWidget = () => setOpen(!open);
 
-  // Unified contact details
+  const toggleWidget = () => setOpen(!open);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+
+  // Cleaned contact details
   const contact: ContactInfo = {
     phone: '+63 917 623 1675',
     altPhone: '+63 917 838 1829',
@@ -111,37 +115,62 @@ export default function ContactUsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
 
-  const navItems = ['Home', 'About Us', 'Services', 'Projects', 'Contact'];
-  const footerNavItems = ['Home', 'About Us', 'Services', 'Products', 'Projects', 'FAQ'];
-
   return (
-    <div className="bg-black text-white font-['Bricolage Grotesque'] text-[17px] sm:text-[18px] leading-relaxed">
-      {/* Sticky Header */}
+    <div className="flex flex-col min-h-screen bg-[#0f172a] text-white overflow-x-hidden font-['Bricolage Grotesque']">
+      {/* === Header === */}
       <motion.header
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="sticky top-0 z-50 w-full bg-white/10 backdrop-blur-lg shadow-md"
+        className="sticky top-0 z-50 w-full bg-[#1e293b]/90 backdrop-blur-lg shadow-lg border-b border-[#334155]"
       >
-        <div className="w-full max-w-[1600px] mx-auto px-6 sm:px-20 py-4 flex items-center gap-16 text-white">
-          <Image src="/clientslogo/TMClog0s.png" alt="Logo" width={210} height={25} />
+        <div className="max-w-[1600px] mx-auto px-6 sm:px-20 py-4 flex items-center justify-between relative">
+          {/* Logo */}
+          <Image src="/clientslogo/TMClog0s.png" alt="Logo" width={180} height={25} priority />
 
           {/* Desktop Nav */}
-          <nav className="hidden sm:flex gap-10 ml-50 text-[18px] font-medium">
-            <a href="/" className="hover:underline transition-all">Home</a>
-            <a href="/about" className="hover:underline transition-all">About Us</a>
-            <a href="/service" className="hover:underline transition-all">Services</a>
-            <a href="/product" className="hover:underline transition-all">Products</a>
-            <a href="/project" className="hover:underline transition-all">Projects</a>
-            <a href="/contact" className="hover:underline transition-all">Contact</a>
-            <a href="/FAQ" className="hover:underline transition-all">FAQ</a>
+          <nav className="hidden sm:flex gap-10 text-[18px] font-medium">
+            <a href="/" className="hover:text-[#f59e0b] transition-colors">Home</a>
+            <a href="/about" className="hover:text-[#f59e0b] transition-colors">About Us</a>
+            <a href="/service" className="hover:text-[#f59e0b] transition-colors">Services</a>
+            <a href="/product" className="hover:text-[#f59e0b] transition-colors">Products</a>
+            <a href="/project" className="hover:text-[#f59e0b] transition-colors">Projects</a>
+            <a href="/contact" className="hover:text-[#f59e0b] transition-colors">Contact</a>
+            <a href="/FAQ" className="hover:text-[#f59e0b] transition-colors">FAQ</a>
           </nav>
 
-          {/* CTA Button */}
-          <div className="fixed bottom-6 right-20 z-50">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={toggleMobileMenu}
+            className="sm:hidden text-white z-50 p-2"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
+
+          {/* Floating Contact Button */}
+          <div className="absolute right-6 bottom-full mb-4 z-50">
+            <button
+              onClick={toggleWidget}
+              className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center rounded-full text-white text-xl shadow-xl transition-all ${
+                open ? 'bg-indigo-600' : 'bg-[#f59e0b]'
+              } hover:scale-105`}
+              aria-label="Contact options"
+            >
+              {open ? <FaTimes /> : <FaCommentDots />}
+            </button>
+          </div>
+
+          {/* Floating Widget - Expanded */}
+          <AnimatePresence>
             {open && (
-              <div className="absolute top-full mt-3 flex flex-col items-center gap-3">
-                {/* 🔥 Fixed: was `links`, now `quickActions` */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className="absolute right-6 top-full mt-3 flex flex-col items-center gap-3"
+              >
                 {quickActions.map((item, i) => (
                   <a
                     key={i}
@@ -154,29 +183,56 @@ export default function ContactUsPage() {
                     {item.icon}
                   </a>
                 ))}
-              </div>
+              </motion.div>
             )}
-
-            <button
-              onClick={toggleWidget}
-              className={`w-16 h-16 animate-pulse-custom flex items-center justify-center rounded-full text-white text-2xl shadow-xl transition-all ${
-                open ? "bg-indigo-600" : "bg-orange-500"
-              } hover:scale-105`}
-              title="Contact"
-            >
-              {open ? <FaTimes /> : <FaCommentDots />}
-            </button>
-          </div>
+          </AnimatePresence>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="sm:hidden bg-[#1e293b]/95 backdrop-blur-md border-t border-[#f59e0b]/20 overflow-hidden"
+            >
+              <nav className="flex flex-col px-6 py-4 space-y-4 text-lg">
+                {[
+                  { name: 'Home', href: '/' },
+                  { name: 'About Us', href: '/about' },
+                  { name: 'Services', href: '/service' },
+                  { name: 'Products', href: '/product' },
+                  { name: 'Projects', href: '/project' },
+                  { name: 'Contact', href: '/contact' },
+                  { name: 'FAQ', href: '/FAQ' },
+                ].map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="text-white hover:text-[#f59e0b] transition-colors"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setOpen(false);
+                    }}
+                  >
+                    {item.name}
+                  </a>
+                ))}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.header>
 
-      {/* === Hero Section === */}
+      {/* === Hero Section – Cinematic & Bold === */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <motion.div
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255,165,0,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,165,0,0.1) 1px, transparent 1px)
+              linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px)
             `,
             backgroundSize: '40px 40px',
             transform: `translateY(${y.get()}px)`,
@@ -184,42 +240,47 @@ export default function ContactUsPage() {
           }}
           className="absolute inset-0 z-0 pointer-events-none"
         />
+
         <div className="absolute inset-0 opacity-10 z-10 pointer-events-none">
           <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 100 L780 100" stroke="#FFA500" strokeWidth="1" strokeDasharray="5,5" />
-            <path d="M20 200 L780 200" stroke="#FFA500" strokeWidth="1" strokeDasharray="5,5" />
-            <path d="M20 300 L780 300" stroke="#FFA500" strokeWidth="1" strokeDasharray="5,5" />
-            <circle cx="400" cy="300" r="50" stroke="#FFA500" strokeWidth="1" fill="none" strokeDasharray="4,4" />
+            <path d="M20 100 L780 100" stroke="#f59e0b" strokeWidth="1" strokeDasharray="5,5" />
+            <path d="M20 200 L780 200" stroke="#f59e0b" strokeWidth="1" strokeDasharray="5,5" />
+            <path d="M20 300 L780 300" stroke="#f59e0b" strokeWidth="1" strokeDasharray="5,5" />
+            <circle cx="400" cy="300" r="50" stroke="#f59e0b" strokeWidth="1" fill="none" strokeDasharray="4,4" />
           </svg>
         </div>
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
           className="relative z-20 text-center px-4 sm:px-6 max-w-4xl"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300 mb-4 sm:mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#f59e0b] to-[#fbbf24] mb-4 sm:mb-6">
             Let&apos;s Build
             <br />
             <span className="text-white drop-shadow-lg">Something Solid</span>
           </h1>
-          <p className="text-lg sm:text-xl text-gray-200 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
             Whether it&apos;s a project, partnership, or question — we&apos;re ready to connect.
           </p>
         </motion.div>
-        <div className="absolute bottom-10 left-4 sm:left-10 text-orange-500 opacity-20 rotate-12">
+
+        <div className="absolute bottom-10 left-4 sm:left-10 text-[#f59e0b] opacity-20 rotate-12">
           <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
             <path d="M20 80 L20 20 L80 20" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5" />
           </svg>
         </div>
       </section>
 
-      {/* === Contact Info Section === */}
+      {/* === Contact Info Section – Asymmetric & Elegant === */}
       <section className="px-4 sm:px-6 lg:px-8 py-20 md:py-32 relative">
         <div className="absolute inset-0 -skew-y-2 overflow-hidden z-0">
-          <div className="bg-gradient-to-br from-gray-900/30 to-black h-full"></div>
+          <div className="bg-gradient-to-br from-[#1e293b]/30 to-[#0f172a] h-full"></div>
         </div>
+
         <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
+          {/* Left Column – Contact Details */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -228,14 +289,16 @@ export default function ContactUsPage() {
             className="space-y-8 md:space-y-10"
           >
             <div>
-              <span className="text-orange-400 font-bold uppercase tracking-wider text-sm">Get in Touch</span>
+              <span className="text-[#f59e0b] font-bold uppercase tracking-wider text-sm">Get in Touch</span>
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mt-2">
-                We&apos;re Just a Call <span className="text-orange-400">Away</span>
+                We&apos;re Just a Call <span className="text-[#f59e0b]">Away</span>
               </h2>
             </div>
+
             <div className="space-y-6 md:space-y-8">
+              {/* Phone */}
               <div className="flex items-start gap-4 group">
-                <div className="mt-1 p-2 sm:p-3 bg-green-500/20 rounded-full text-green-400 group-hover:bg-green-500 transition">
+                <div className="mt-1 p-2 sm:p-3 bg-green-500/20 rounded-full text-green-400 group-hover:bg-green-500 transition-transform duration-300">
                   <Phone size={20} className="sm:w-6 sm:h-6" />
                 </div>
                 <div>
@@ -244,23 +307,27 @@ export default function ContactUsPage() {
                   <p className="text-gray-400 text-sm">or {contact.altPhone}</p>
                 </div>
               </div>
+
+              {/* Email */}
               <div className="flex items-start gap-4 group">
-                <div className="mt-1 p-2 sm:p-3 bg-blue-500/20 rounded-full text-blue-400 group-hover:bg-blue-500 transition">
+                <div className="mt-1 p-2 sm:p-3 bg-blue-500/20 rounded-full text-blue-400 group-hover:bg-blue-500 transition-transform duration-300">
                   <Mail size={20} className="sm:w-6 sm:h-6" />
                 </div>
                 <div>
                   <h4 className="text-lg sm:text-xl font-semibold text-white">Email</h4>
-                  <a href={`mailto:${contact.email}`} className="text-gray-300 hover:text-blue-400 transition">
+                  <a href={`mailto:${contact.email}`} className="text-gray-300 hover:text-[#f59e0b] transition">
                     {contact.email}
                   </a>
                   <br />
-                  <a href={`mailto:${contact.salesEmail}`} className="text-gray-400 text-sm hover:text-blue-400 transition">
+                  <a href={`mailto:${contact.salesEmail}`} className="text-gray-400 text-sm hover:text-[#f59e0b] transition">
                     {contact.salesEmail}
                   </a>
                 </div>
               </div>
+
+              {/* Address */}
               <div className="flex items-start gap-4 group">
-                <div className="mt-1 p-2 sm:p-3 bg-emerald-500/20 rounded-full text-emerald-400 group-hover:bg-emerald-500 transition">
+                <div className="mt-1 p-2 sm:p-3 bg-emerald-500/20 rounded-full text-emerald-400 group-hover:bg-emerald-500 transition-transform duration-300">
                   <MapPin size={20} className="sm:w-6 sm:h-6" />
                 </div>
                 <div>
@@ -269,13 +336,15 @@ export default function ContactUsPage() {
                     href={contact.locationLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-emerald-400 transition"
+                    className="text-gray-300 hover:text-[#f59e0b] transition"
                   >
                     {contact.address}
                   </a>
                 </div>
               </div>
             </div>
+
+            {/* Social Links */}
             <div className="pt-4 md:pt-6">
               <h4 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Follow Us</h4>
               <div className="flex gap-4">
@@ -289,7 +358,7 @@ export default function ContactUsPage() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-orange-400 transition-transform hover:scale-110"
+                    className="text-gray-300 hover:text-[#f59e0b] transition-transform hover:scale-110"
                     aria-label={social.label}
                   >
                     {social.icon}
@@ -298,6 +367,8 @@ export default function ContactUsPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* Right Column – Visual */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -305,21 +376,23 @@ export default function ContactUsPage() {
             viewport={{ once: true }}
             className="relative mt-10 lg:mt-0"
           >
-            <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 w-full h-full border-4 border-orange-500/40 rounded-2xl z-0"></div>
+            <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 w-full h-full border-4 border-[#f59e0b]/40 rounded-2xl z-0"></div>
+
             <Image
               src="/MLlogo.jpg"
               alt="Modern Office Interior"
               width={600}
               height={450}
-              className="rounded-xl shadow-2xl object-cover w-full relative z-10"
+              className="rounded-xl shadow-2xl object-cover w-full relative z-10 transform transition-transform duration-500 hover:scale-105"
               priority
             />
+
             <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none"></div>
           </motion.div>
         </div>
       </section>
 
-      {/* === Interactive Map Section === */}
+      {/* === Interactive Map Section – Premium Look === */}
       <section id="location" className="py-20 md:py-32 relative px-4 sm:px-6 lg:px-8">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -328,11 +401,12 @@ export default function ContactUsPage() {
           viewport={{ once: true }}
           className="text-3xl sm:text-4xl md:text-5xl font-black text-center text-white mb-4 sm:mb-6"
         >
-          Find Us on the <span className="text-orange-400">Ground</span>
+          Find Us on the <span className="text-[#f59e0b]">Ground</span>
         </motion.h2>
         <p className="text-center text-gray-300 max-w-2xl mx-auto mb-8 sm:mb-12 px-4">
           Located in the heart of Quezon City, our office is accessible and ready for your visit.
         </p>
+
         <div className="relative w-full max-w-6xl mx-auto rounded-xl md:rounded-3xl overflow-hidden shadow-3xl border-2 md:border-4 border-white/20">
           <div className="aspect-video">
             <iframe
@@ -348,6 +422,7 @@ export default function ContactUsPage() {
             />
           </div>
         </div>
+
         <motion.div
           animate={{ y: [0, -8, 0] }}
           transition={{ repeat: Infinity, duration: 3 }}
@@ -359,19 +434,18 @@ export default function ContactUsPage() {
         </motion.div>
       </section>
 
-    
-
-      {/* === Footer === */}
+      {/* === Footer – Brand Legacy === */}
       <footer
-        className="relative bg-black py-12 sm:py-20 px-4 sm:px-6 lg:px-8 text-sm text-gray-400"
+        className="relative bg-[#0f172a] py-12 sm:py-20 px-4 sm:px-6 lg:px-8 text-sm text-gray-400"
         style={{
           backgroundImage: "url('/textures/concrete-dark.jpg')",
           backgroundSize: 'cover',
           backgroundBlendMode: 'overlay',
-          backgroundColor: 'rgba(0,0,0,0.95)',
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] via-transparent to-transparent pointer-events-none"></div>
+
         <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
           <div className="space-y-4 sm:space-y-5">
             <Image
@@ -396,22 +470,24 @@ export default function ContactUsPage() {
               </a>
             </div>
           </div>
+
           <div>
             <h4 className="text-white font-bold mb-3 sm:mb-5">Navigate</h4>
             <ul className="space-y-2 sm:space-y-3">
-              {footerNavItems.map((item) => (
+              {['Home', 'About Us', 'Services', 'Products', 'Projects', 'FAQ'].map((item) => (
                 <li key={item}>
                   <a
                     href={`/${item.toLowerCase().replace(' ', '-')}`}
-                    className="text-gray-300 hover:text-orange-400 transition-colors flex items-center gap-2 group text-sm sm:text-base"
+                    className="text-gray-300 hover:text-[#f59e0b] transition-colors flex items-center gap-2 group text-sm sm:text-base"
                   >
-                    <span className="w-1 h-1 bg-transparent group-hover:bg-orange-400 rounded-full transition"></span>
+                    <span className="w-1 h-1 bg-transparent group-hover:bg-[#f59e0b] rounded-full transition"></span>
                     {item}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
+
           <div>
             <h4 className="text-white font-bold mb-3 sm:mb-5">Contact</h4>
             <ul className="space-y-1 sm:space-y-2 text-gray-300 text-sm sm:text-base">
@@ -429,6 +505,7 @@ export default function ContactUsPage() {
               </li>
             </ul>
           </div>
+
           <div>
             <h4 className="text-white font-bold mb-3 sm:mb-5">Our Commitment</h4>
             <p className="text-gray-300 text-xs sm:text-sm">
@@ -436,6 +513,7 @@ export default function ContactUsPage() {
             </p>
           </div>
         </div>
+
         <div className="mt-12 sm:mt-16 text-center text-xs text-gray-500 relative z-10">
           &copy; {new Date().getFullYear()} Tiger&apos;s Mark Corporation. Engineered for excellence.
         </div>
